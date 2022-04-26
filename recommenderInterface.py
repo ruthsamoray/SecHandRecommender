@@ -16,6 +16,9 @@ NUM_OF_RECOMMENDED_ITEMS = 4
 
 
 def get_item_id(item_indx):
+	"""
+	get itemId based on item's index
+	"""
 	return 'i' + str(item_indx)
 
 
@@ -121,8 +124,8 @@ class RecommenderVisualInterface(Tk):
 		self.recommender_model.login_user(username)
 		self.frames[WelcomePage].set_username(username)
 
-	def update_users_ratings(self, items, ratings):  # ratings_dict):
-		self.recommender_model.update_ratings(items, ratings)  # ratings_dict)
+	def update_users_ratings(self, items, ratings):
+		self.recommender_model.update_ratings(items, ratings)
 
 	def get_recommended_items(self):
 		return self.recommender_model.get_recommendations(NUM_OF_RECOMMENDED_ITEMS)
@@ -144,7 +147,6 @@ class LoginPage(Frame):
 	"""
 	First page that user will see: Login Page.
 	"""
-
 	def __init__(self, master, controller):
 		Frame.__init__(self, master)
 		self.controller = controller
@@ -170,7 +172,7 @@ class LoginPage(Frame):
 		b_frame.pack(pady=(70, 10), anchor='center')
 
 		start_button = Button(b_frame, text="continue", command=self.save_username, font=(FONT, 14),
-							  fg=TEXT_COLOR)  # , highlightbackground=BACKGROUNG_COLOR_2)
+							  fg=TEXT_COLOR)
 		start_button.pack(side='right', ipady=7, padx=20)
 		quit_button = Button(b_frame, text="quit", command=self.on_closing, font=(FONT, 14), fg=TEXT_COLOR)
 		quit_button.pack(side='left', ipady=7, ipadx=15, padx=50)
@@ -193,7 +195,6 @@ class WelcomePage(Frame):
 	Second page that user will see: welcome page.
 	description and explanations.
 	"""
-
 	def __init__(self, master, controller):
 		Frame.__init__(self, master)
 		self.controller = controller
@@ -234,6 +235,9 @@ class WelcomePage(Frame):
 		quit_button.pack(side='right', ipady=7, ipadx=15, padx=50)
 
 	def set_username(self, username):
+		"""
+		set the username of the current user to present on the screen
+		"""
 		info_text = "Welcome " + username + "!"
 		self.welcome_label.configure(text=info_text)
 
@@ -247,10 +251,8 @@ class WelcomePage(Frame):
 
 class RatingPage(Frame):
 	"""
-	Class that displays the window for the life style survey questions.
-	When the user answers a question, the answer saved to a list.
+	Class that the page of rating an item
 	"""
-
 	def __init__(self, master, controller):
 		Frame.__init__(self, master)
 		self.controller = controller
@@ -259,7 +261,6 @@ class RatingPage(Frame):
 
 		self.img_indx = self.controller.get_item_to_rate()
 		self.length_of_list = RATING_SEQUENCE_LENGTH
-		# self.ratings_dict = dict()
 		self.rated_items = []
 		self.ratings = []
 
@@ -305,10 +306,9 @@ class RatingPage(Frame):
 		quit_button.pack(side='left', ipady=7, ipadx=15, padx=(1, 100))
 
 	def nextQuestion(self):
-		'''
-		When button is clicked, add user's input to a list
-		and display next question.
-		'''
+		"""
+		When button is clicked, save user's rating and display next question.
+		"""
 		answer = self.var.get()
 		if answer == '0':
 			dialogBox("No Value Given", "You did not rate the item,\nPlease try again.")
@@ -317,7 +317,6 @@ class RatingPage(Frame):
 			self.cnt = (self.cnt + 1)
 			self.rated_items.append(get_item_id(self.img_indx))
 			self.ratings.append(answer)
-			# self.ratings_dict[self.img_indx] = answer
 
 			if self.cnt == self.length_of_list:
 				self.quit_ratings(func=lambda: self.controller.show_frame(RecommendPage))
@@ -329,6 +328,10 @@ class RatingPage(Frame):
 				time.sleep(.2)  # delay between items
 
 	def quit_ratings(self, func):
+		"""
+		when quitting the rating page, process the rated items in this session.
+		:param func: function to operate after
+		"""
 		answer = self.var.get()
 		# if answer != '0' and self.img_indx not in self.ratings_dict:
 		if answer != '0' and (len(self.rated_items) == 0 or get_item_id(self.img_indx) != self.rated_items[-1]):
@@ -348,10 +351,8 @@ class RatingPage(Frame):
 
 class RecommendPage(Frame):
 	"""
-	Second page that user will see: welcome page.
-	description and explanations.
+	Page for the recommended items
 	"""
-
 	def __init__(self, master, controller):
 		Frame.__init__(self, master)
 		self.controller = controller

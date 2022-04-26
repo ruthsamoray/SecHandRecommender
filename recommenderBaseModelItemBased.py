@@ -8,6 +8,9 @@ SIMILARITY_MATRIX_PATH = 'w_matrix.pkl'
 
 
 class RecommenderBaseModel:
+	"""
+	Implements the ML model for the recommender
+	"""
 	def __init__(self, data_filename, load_existing_sim_matrix):
 		self.ratings = pd.read_csv(data_filename, encoding='"ISO-8859-1"')
 		self.process_ratings_data()
@@ -79,10 +82,13 @@ class RecommenderBaseModel:
 			for item_2 in distinct_item_2:
 				paired_item_1_2 = record_item_1_2[record_item_1_2['item_2'] == item_2]
 				sim_value_numerator = (paired_item_1_2['rating_adjusted_1'] * paired_item_1_2['rating_adjusted_2']).sum()
-				sim_value_denominator = np.sqrt(np.square(paired_item_1_2['rating_adjusted_1']).sum()) * np.sqrt(np.square(paired_item_1_2['rating_adjusted_2']).sum())
+				sim_value_denominator = np.sqrt(np.square(paired_item_1_2['rating_adjusted_1']).sum())\
+										* np.sqrt(np.square(paired_item_1_2['rating_adjusted_2']).sum())
 				sim_value_denominator = sim_value_denominator if sim_value_denominator != 0 else 1e-8
 				sim_value = sim_value_numerator / sim_value_denominator
-				self.similarity_matrix = self.similarity_matrix.append(pd.Series([item_1, item_2, sim_value], index=['item_1', 'item_2', 'weight']), ignore_index=True)
+				self.similarity_matrix = self.similarity_matrix.append(pd.Series([item_1, item_2, sim_value],
+																				 index=['item_1', 'item_2', 'weight']),
+																	   ignore_index=True)
 
 			i = i + 1
 
@@ -141,7 +147,8 @@ class RecommenderBaseModel:
 			#if rating_mean[rating_mean['itemId'] == item_j].shape[0] > 0:
 			rating_mean_j = self.rating_mean[self.rating_mean['itemId'] == item_j]['rating_mean'].iloc[0]
 			# only calculate the weighted values when the weight between item_1 and item_2 exists in weight matrix
-			w_item_1_2 = self.similarity_matrix[(self.similarity_matrix['item_1'] == item) & (self.similarity_matrix['item_2'] == item_j)]
+			w_item_1_2 = self.similarity_matrix[(self.similarity_matrix['item_1'] == item) &
+												(self.similarity_matrix['item_2'] == item_j)]
 			if w_item_1_2.shape[0] > 0:
 				user_rating_j = user_other_ratings[user_other_ratings['itemId']==item_j]
 				sum_weighted_other_ratings += (user_rating_j['rating'].iloc[0] - rating_mean_j) * w_item_1_2['weight'].iloc[0]
